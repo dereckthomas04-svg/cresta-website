@@ -315,5 +315,11 @@ export default {
 'm.mailto':"Votre messagerie devrait s’ouvrir avec votre message prêt : il ne reste qu’à l’envoyer. Si elle ne s’est pas ouverte, écrivez-nous à {email} ou {wa}.",
 'm.waLink':"contactez-nous sur WhatsApp",
 'foot.ctaT':"Un projet en tête ?",
-'foot.ctaD':"Dites-nous ce dont vous avez besoin : nous répondons sous un jour ouvré."
+'foot.ctaD':"Dites-nous ce dont vous avez besoin : nous répondons sous un jour ouvré.",
+'m.sendVia':"Presque fini — choisissez comment envoyer votre message :",
+'m.gmail':"Envoyer avec Gmail",
+'m.mailApp':"Utiliser ma messagerie",
+'m.wa':"Envoyer sur WhatsApp",
+'m.copy':"Copier le message",
+'m.copied':"Copié — collez-le dans un e-mail à {email}."
 };

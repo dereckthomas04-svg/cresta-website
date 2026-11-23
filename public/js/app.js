@@ -178,21 +178,39 @@ function composeMessage(form) {
   return { subject, body: lines.join('\n') };
 }
 function showFallback(form, msg) {
-  const m = form.querySelector('.form-msg'); m.className = 'form-msg ok'; m.textContent = '';
-  const raw = String(dicts[lang]?.['m.mailto'] ?? EN['m.mailto']);
-  const mail = document.createElement('a'); mail.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent(msg.subject)}&body=${encodeURIComponent(msg.body)}`; mail.textContent = CONFIG.email;
-  const wa = document.createElement('a'); wa.href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent((msg.subject + '\n' + msg.body).slice(0, 1500))}`; wa.target = '_blank'; wa.rel = 'noopener'; wa.textContent = t('m.waLink');
-  for (const part of raw.split(/(\{email\}|\{wa\})/)) m.append(part === '{email}' ? mail : part === '{wa}' ? wa : part);
+  // A plain mailto: does nothing on computers without an email app set up,
+  // so give the visitor explicit, visible ways to send the prepared message.
+  const enc = encodeURIComponent;
+  const full = `${msg.subject}\n\n${msg.body}`;
+  const m = form.querySelector('.form-msg'); m.className = 'form-msg send-box'; m.textContent = '';
+  const p = document.createElement('p'); p.textContent = t('m.sendVia'); m.append(p);
+  const row = document.createElement('div'); row.className = 'send-opts';
+  const link = (cls, href, label, ev, blank = true) => {
+    const a = document.createElement('a'); a.className = 'btn ' + cls; a.href = href; a.textContent = label;
+    if (blank) { a.target = '_blank'; a.rel = 'noopener'; }
+    a.addEventListener('click', () => track(ev)); return a;
+  };
+  row.append(
+    link('btn-red', `https://mail.google.com/mail/?view=cm&fs=1&to=${enc(CONFIG.email)}&su=${enc(msg.subject)}&body=${enc(msg.body)}`, t('m.gmail'), 'send_gmail'),
+    link('btn-ghost', `mailto:${CONFIG.email}?subject=${enc(msg.subject)}&body=${enc(msg.body)}`, t('m.mailApp'), 'send_mailapp', false),
+    link('btn-ghost', `https://wa.me/${CONFIG.whatsapp}?text=${enc(full.slice(0, 1500))}`, t('m.wa'), 'send_whatsapp')
+  );
+  const copy = document.createElement('button'); copy.type = 'button'; copy.className = 'btn btn-ghost'; copy.textContent = t('m.copy');
+  const note = document.createElement('p'); note.className = 'send-note';
+  copy.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(`To: ${CONFIG.email}\n${full}`); note.textContent = t('m.copied', { email: CONFIG.email }); }
+    catch { note.textContent = `${CONFIG.email}`; }
+  });
+  row.append(copy); m.append(row, note);
+  m.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 function initForms() {
   for (const form of $$('form[data-lead]')) {
     form.addEventListener('submit', e => {
       e.preventDefault();
       if (!validate(form)) return setMsg(form, 'err', t('m.invalid'));
-      const msg = composeMessage(form);
-      showFallback(form, msg);
+      showFallback(form, composeMessage(form));
       track('lead_' + form.dataset.lead);
-      location.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent(msg.subject)}&body=${encodeURIComponent(msg.body)}`;
     });
   }
 }

@@ -315,5 +315,11 @@ export default {
 'm.mailto':"Seu aplicativo de e-mail deve abrir com a mensagem pronta — é só enviar. Se ele não abriu, escreva para {email} ou {wa}.",
 'm.waLink':"fale conosco pelo WhatsApp",
 'foot.ctaT':"Tem um projeto em mente?",
-'foot.ctaD':"Conte o que você precisa e responderemos em até um dia útil."
+'foot.ctaD':"Conte o que você precisa e responderemos em até um dia útil.",
+'m.sendVia':"Quase pronto — escolha como enviar sua mensagem:",
+'m.gmail':"Enviar pelo Gmail",
+'m.mailApp':"Usar meu app de e-mail",
+'m.wa':"Enviar pelo WhatsApp",
+'m.copy':"Copiar mensagem",
+'m.copied':"Copiado — cole em um e-mail para {email}."
 };

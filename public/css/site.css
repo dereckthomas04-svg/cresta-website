@@ -150,6 +150,13 @@ button,input,select,textarea{font:inherit;color:inherit}
 .form-msg{font-size:14px;min-height:1.2em}
 .form-msg.ok{color:#1d7a4a}.form-msg.err{color:#b3203b}
 .form-msg a{color:inherit}
+.send-box{display:grid;gap:12px;padding:16px;border-radius:12px;background:var(--bg2);border:1px solid var(--line);color:var(--text)}
+.send-box>p{font-weight:600}
+.send-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.send-opts .btn{min-height:44px;padding:0 14px;font-size:14px;white-space:normal;text-align:center}
+.send-box a.btn{color:inherit}.send-box a.btn-red{color:#fff}
+.send-note{font-size:13px;color:var(--mute)}
+@media (max-width:420px){.send-opts{grid-template-columns:1fr}}
 
 .report-shell{margin-top:56px}
 .progress{display:flex;gap:28px;align-items:flex-start}

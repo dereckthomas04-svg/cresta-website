@@ -315,5 +315,11 @@ export default {
 'm.mailto':"Your email app should now open with your message ready — just press send. If it didn't open, email us at {email} or {wa}.",
 'm.waLink':"message us on WhatsApp",
 'foot.ctaT':"Have a project in mind?",
-'foot.ctaD':"Tell us what you need and we'll reply within one business day."
+'foot.ctaD':"Tell us what you need and we'll reply within one business day.",
+'m.sendVia':"Almost done — choose how to send your message:",
+'m.gmail':"Send with Gmail",
+'m.mailApp':"Use my email app",
+'m.wa':"Send on WhatsApp",
+'m.copy':"Copy message",
+'m.copied':"Copied — paste it into an email to {email}."
 };
