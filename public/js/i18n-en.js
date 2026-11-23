@@ -311,5 +311,9 @@ export default {
 'why.r6':"After launch we're still here for updates, fixes and improvements whenever you need them.",
 'why.p1':"Fixed written quote before work starts",
 'why.p2':"A reply within one business day",
-'why.p3':"You own your site, content and domain"
+'why.p3':"You own your site, content and domain",
+'m.mailto':"Your email app should now open with your message ready — just press send. If it didn't open, email us at {email} or {wa}.",
+'m.waLink':"message us on WhatsApp",
+'foot.ctaT':"Have a project in mind?",
+'foot.ctaD':"Tell us what you need and we'll reply within one business day."
 };

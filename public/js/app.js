@@ -160,49 +160,45 @@ function validate(form) {
 function normUrl(v) {
   try { const s = v.trim(); const u = new URL(/^https?:\/\//i.test(s) ? s : 'https://' + s); return u.hostname.includes('.') ? u.href : null; } catch { return null; }
 }
-function payload(form, type) {
-  const fd = new FormData(form); const o = { type, lang, t: Number(form.dataset.t) || 0 };
-  for (const [k, v] of fd) o[k] = typeof v === 'string' ? v.trim() : v;
-  for (const c of form.querySelectorAll('input[type=checkbox]')) o[c.name] = c.checked;
-  if (o.consent === '1') o.consent = true;
-  if (o.website) o.website = normUrl(o.website) || o.website;
-  return o;
-}
-function setMsg(form, kind, text, fallback) {
+function setMsg(form, kind, text) {
   const m = form.querySelector('.form-msg'); m.className = 'form-msg ' + kind; m.textContent = text;
-  if (fallback) {
-    const [before, after = ''] = String(dicts[lang]?.['m.fallback'] ?? EN['m.fallback']).split('{email}');
-    const a = document.createElement('a'); a.href = `mailto:${CONFIG.email}`; a.textContent = CONFIG.email;
-    m.append(' ' + before, a, after);
-  }
 }
-async function postLead(data) {
-  const res = await fetch('/api/lead', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data) });
-  const json = (res.headers.get('content-type') || '').includes('json') ? await res.json() : { ok: false, error: 'not_configured' };
-  return { status: res.status, ...json };
+// No email service is connected, so forms hand the message to the visitor's own
+// email app (pre-filled and addressed to us), with email + WhatsApp shown as backups.
+function composeMessage(form) {
+  const lines = [];
+  for (const el of form.querySelectorAll('input,select,textarea')) {
+    if (el.type === 'checkbox' || el.type === 'hidden' || !el.value.trim()) continue;
+    const label = el.closest('label')?.querySelector('span')?.textContent.trim() || el.name;
+    const value = el.tagName === 'SELECT' ? el.selectedOptions[0]?.textContent.trim() : el.value.trim();
+    lines.push(el.tagName === 'TEXTAREA' ? `\n${label}:\n${value}` : `${label}: ${value}`);
+  }
+  const name = form.querySelector('[name=name]')?.value.trim();
+  const subject = `${form.querySelector('h3')?.textContent.trim() || 'Website enquiry'}${name ? ' — ' + name : ''}`;
+  return { subject, body: lines.join('\n') };
+}
+function showFallback(form, msg) {
+  const m = form.querySelector('.form-msg'); m.className = 'form-msg ok'; m.textContent = '';
+  const raw = String(dicts[lang]?.['m.mailto'] ?? EN['m.mailto']);
+  const mail = document.createElement('a'); mail.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent(msg.subject)}&body=${encodeURIComponent(msg.body)}`; mail.textContent = CONFIG.email;
+  const wa = document.createElement('a'); wa.href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent((msg.subject + '\n' + msg.body).slice(0, 1500))}`; wa.target = '_blank'; wa.rel = 'noopener'; wa.textContent = t('m.waLink');
+  for (const part of raw.split(/(\{email\}|\{wa\})/)) m.append(part === '{email}' ? mail : part === '{wa}' ? wa : part);
 }
 function initForms() {
   for (const form of $$('form[data-lead]')) {
-    form.dataset.t = Date.now();
-    form.addEventListener('submit', async e => {
+    form.addEventListener('submit', e => {
       e.preventDefault();
-      const type = form.dataset.lead;
       if (!validate(form)) return setMsg(form, 'err', t('m.invalid'));
-      const btn = form.querySelector('[type=submit]'); btn.disabled = true; setMsg(form, '', t('m.sending'));
-      try {
-        const r = await postLead(payload(form, type));
-        if (r.ok) { setMsg(form, 'ok', t(type === 'newsletter' ? 'm.okNews' : 'm.ok')); form.reset(); track('lead_' + type); }
-        else if (r.error === 'rate_limited') setMsg(form, 'err', t('m.rate'));
-        else if (r.error === 'not_configured' || r.status >= 500) setMsg(form, 'err', t('m.notConfigured'), true);
-        else setMsg(form, 'err', t('m.invalid'));
-      } catch { setMsg(form, 'err', t('m.err'), true); }
-      btn.disabled = false;
+      const msg = composeMessage(form);
+      showFallback(form, msg);
+      track('lead_' + form.dataset.lead);
+      location.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent(msg.subject)}&body=${encodeURIComponent(msg.body)}`;
     });
   }
 }
 
 // ───────── audit ─────────
-let lastReport = null; let lastLead = null; let emailState = null;
+let lastReport = null;
 const scoreClass = s => s == null ? '' : s >= 90 ? 'g' : s >= 50 ? 'm' : 'b';
 const scoreColor = s => s == null ? '#b9b1a9' : s >= 90 ? '#2f9e62' : s >= 50 ? '#d08a17' : '#c4243f';
 const PRIO_COLORS = { critical: '#8b0f2a', high: '#d0452b', medium: '#d39a2b', low: '#8a9aa6' };
@@ -211,13 +207,11 @@ const SVC_FOR = { performance: 'svc.s7t', mobile: 'svc.s2t', seo: 'svc.s5t', con
 function setStep(step, state) { const li = $(`#auditSteps [data-step="${step}"]`); if (li) li.className = state; }
 
 function initAudit() {
-  const form = $('#auditForm'); form.dataset.t = Date.now();
+  const form = $('#auditForm');
   form.addEventListener('submit', async e => {
     e.preventDefault();
     if (!validate(form)) return setMsg(form, 'err', t('m.invalid'));
-    const lead = payload(form, 'audit');
-    const url = normUrl(lead.website); if (!url) return setMsg(form, 'err', t('m.badUrl'));
-    lead.website = url; lastLead = lead; emailState = null;
+    const url = normUrl(form.website.value); if (!url) return setMsg(form, 'err', t('m.badUrl'));
     const btn = form.querySelector('[type=submit]'); btn.disabled = true; setMsg(form, '', '');
     track('audit_start');
     const shell = $('#reportShell'); shell.hidden = false; $('#report').innerHTML = ''; $('#auditProgress').hidden = false;
@@ -236,32 +230,15 @@ function initAudit() {
     clearTimeout(timer);
     setStep('report', 'run');
     const report = (page || mobile) ? buildReport({ url, mobile, desktop, page, errors }) : { fatal: true, url, errors };
-    report.business = lead.business || lead.name;
     lastReport = report;
     $('#auditProgress').hidden = true; setStep('report', 'ok');
     renderReport(report);
     btn.disabled = false;
     track(report.fatal ? 'audit_failed' : 'audit_complete', { score: report.overall ?? -1 });
-
-    // Capture the lead (and email the report if asked). Never claim success we didn't get.
-    try {
-      const r = await postLead({ ...lead, report: report.fatal ? undefined : summary(report) });
-      emailState = lead.sendCopy ? (r.ok && r.emailedCopy ? 'sent' : 'failed') : null;
-    } catch { emailState = lead.sendCopy ? 'failed' : null; }
-    if (lastReport === report) renderReport(report);
   });
 }
 
 function issueText(i) { return { title: t(`i.${i.id}.t`, i.p), fix: t(`i.${i.id}.f`, i.p) }; }
-function summary(r) {
-  return {
-    url: r.url, overall: r.overall,
-    categories: r.categories.map(c => ({ name: t('cat.' + c.id), score: c.score, note: c.score == null ? (c.reason === 'manual' ? t('r.manual') : t('r.unavailable')) : '' })),
-    issues: r.issues.slice(0, 20).map(i => ({ priority: t('p.' + i.pr), ...issueText(i) })),
-    labels: { title: t('r.title'), categories: t('r.cats'), issues: t('r.issues'), cta: t('r.helpP'), subject: t('r.subject') }
-  };
-}
-
 function gauge(score) {
   const C = 2 * Math.PI * 80, off = score == null ? C : C * (1 - score / 100);
   return `<div class="gauge" role="img" aria-label="${esc(t('r.overall'))}: ${score ?? '—'}/100"><svg viewBox="0 0 180 180"><circle cx="90" cy="90" r="80" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="12"/><circle class="arc" cx="90" cy="90" r="80" fill="none" stroke="${scoreColor(score)}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}" data-off="${off}" style="transition:stroke-dashoffset 1.4s cubic-bezier(.2,.7,.2,1)"/></svg><div class="val"><div>${score ?? '—'}<small>${esc(t('r.overall'))}</small></div></div></div>`;
@@ -306,7 +283,6 @@ function renderReport(r) {
 
   const weakCats = r.categories.filter(c => c.score != null && c.score < 75).map(c => SVC_FOR[c.id]).filter(Boolean);
   const svcs = [...new Set(weakCats)];
-  const emailLine = emailState === 'sent' ? `<p class="rep-note" style="color:#2f9e62">${esc(t('r.emailed', { e: lastLead?.email }))}</p>` : emailState === 'failed' ? `<p class="rep-note">${esc(t('r.notEmailed'))}</p>` : '';
 
   box.innerHTML = `<article class="rep" aria-label="${esc(t('r.title'))}">
     <header class="rep-top"><div><h3>${esc(t('r.title'))}</h3><p class="meta">${esc(r.url)}</p>
@@ -321,7 +297,7 @@ function renderReport(r) {
     <section class="rep-sec help"><h4>${esc(t('r.helpT'))}</h4><p>${esc(t('r.helpP'))}</p>
       ${svcs.length ? `<p style="margin-top:14px">${esc(t('r.helpSvc'))} <b>${svcs.map(k => esc(t(k))).join(' · ')}</b></p>` : ''}
       <div class="cta-row"><button class="btn btn-red" data-open="consult" data-track="report_consult">${esc(t('r.helpBook'))}</button><button class="btn btn-ghost" data-open="quote" data-service="redesign" data-track="report_quote">${esc(t('r.helpQuote'))}</button></div></section>
-    <section class="rep-sec">${emailLine}<div class="rep-actions"><button class="btn btn-ghost" data-print>${esc(t('r.print'))}</button><button class="btn btn-ghost" data-again>${esc(t('r.again'))}</button></div>
+    <section class="rep-sec"><div class="rep-actions"><button class="btn btn-ghost" data-print>${esc(t('r.print'))}</button><button class="btn btn-ghost" data-again>${esc(t('r.again'))}</button></div>
       <p class="rep-src" style="margin-top:16px">${esc(t('r.sources', { v: r.lighthouseVersion || '—' }))}</p></section>
   </article>`;
   requestAnimationFrame(() => requestAnimationFrame(() => {

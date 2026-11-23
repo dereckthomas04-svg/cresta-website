@@ -311,5 +311,9 @@ export default {
 'why.r6':"Après la mise en ligne, nous restons disponibles pour les mises à jour, corrections et améliorations.",
 'why.p1':"Devis ferme par écrit avant le démarrage",
 'why.p2':"Une réponse sous un jour ouvré",
-'why.p3':"Votre site, votre contenu et votre domaine vous appartiennent"
+'why.p3':"Votre site, votre contenu et votre domaine vous appartiennent",
+'m.mailto':"Votre messagerie devrait s’ouvrir avec votre message prêt : il ne reste qu’à l’envoyer. Si elle ne s’est pas ouverte, écrivez-nous à {email} ou {wa}.",
+'m.waLink':"contactez-nous sur WhatsApp",
+'foot.ctaT':"Un projet en tête ?",
+'foot.ctaD':"Dites-nous ce dont vous avez besoin : nous répondons sous un jour ouvré."
 };

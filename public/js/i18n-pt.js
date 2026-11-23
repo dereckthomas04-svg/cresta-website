@@ -311,5 +311,9 @@ export default {
 'why.r6':"Depois do lançamento continuamos aqui para atualizações, correções e melhorias sempre que precisar.",
 'why.p1':"Orçamento fechado por escrito antes de começar",
 'why.p2':"Resposta em até um dia útil",
-'why.p3':"Seu site, conteúdo e domínio são seus"
+'why.p3':"Seu site, conteúdo e domínio são seus",
+'m.mailto':"Seu aplicativo de e-mail deve abrir com a mensagem pronta — é só enviar. Se ele não abriu, escreva para {email} ou {wa}.",
+'m.waLink':"fale conosco pelo WhatsApp",
+'foot.ctaT':"Tem um projeto em mente?",
+'foot.ctaD':"Conte o que você precisa e responderemos em até um dia útil."
 };

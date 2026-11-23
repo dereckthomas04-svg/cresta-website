@@ -311,5 +311,9 @@ export default {
 'why.r6':"Nach dem Launch sind wir weiter für Updates, Korrekturen und Verbesserungen da, wann immer Sie sie brauchen.",
 'why.p1':"Verbindliches schriftliches Angebot vor Projektstart",
 'why.p2':"Antwort innerhalb eines Werktags",
-'why.p3':"Website, Inhalte und Domain gehören Ihnen"
+'why.p3':"Website, Inhalte und Domain gehören Ihnen",
+'m.mailto':"Ihr E-Mail-Programm sollte sich jetzt mit Ihrer fertigen Nachricht öffnen – einfach absenden. Falls nicht, schreiben Sie uns an {email} oder {wa}.",
+'m.waLink':"per WhatsApp",
+'foot.ctaT':"Ein Projekt im Kopf?",
+'foot.ctaD':"Sagen Sie uns, was Sie brauchen – wir antworten innerhalb eines Werktags."
 };
