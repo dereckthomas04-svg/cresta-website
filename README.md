@@ -28,7 +28,7 @@ Any Node host (Render, Railway, Fly, a VPS) also works: `node server.js`.
 ## Lead delivery (`.env`)
 | Variable | Purpose |
 |---|---|
-| `RESEND_API_KEY`, `LEADS_TO_EMAIL`, optional `FROM_EMAIL` (plain address is fine) | Email every lead to you, and email audit reports to customers who ask for a copy |
+| `RESEND_API_KEY` (required); optional `LEADS_TO_EMAIL` (default crestaagencyco@gmail.com) and `FROM_EMAIL` (default onboarding@resend.dev) | Email every lead to you, and email audit reports to customers who ask for a copy |
 | `LEADS_WEBHOOK_URL` | POST each lead as JSON to Zapier/Make/Google Sheets/your CRM |
 
 If no channel is configured on Netlify, forms say "not connected yet" and show your email instead. They never pretend a message was sent.
