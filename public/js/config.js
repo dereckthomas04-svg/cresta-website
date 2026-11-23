@@ -14,7 +14,7 @@ export const CONFIG = {
   // Google PageSpeed Insights API key (optional but recommended: raises quota).
   // Create at console.cloud.google.com → APIs → PageSpeed Insights API.
   // Restrict it by HTTP referrer to your domain; it is safe to expose in the browser.
-  psiKey: '',
+  psiKey: 'AIzaSyAxYj1njmj55Cfz79i8ReSYll1aWGCTbpE',
 
   // Analytics: fill one (or both). Empty → no analytics scripts load at all.
   ga4Id: '',                              // e.g. 'G-XXXXXXX'
