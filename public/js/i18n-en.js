@@ -4,7 +4,7 @@ export default {
 'nav.services':'Services',
 'nav.work':'Our Work',
 'nav.contact':'Contact',
-'nav.start':'Get Started',
+'nav.start':'Let’s talk',
 'nav.language':'Language',
 'hero.title':'We build websites that turn visitors into customers.',
 'hero.sub':'Your website is your hardest-working salesperson — or your quietest. We design and build custom, fast, search-ready websites that earn trust in seconds and make it effortless for people to call, book, or buy.',

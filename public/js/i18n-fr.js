@@ -4,7 +4,7 @@ export default {
 'nav.services':'Services',
 'nav.work':'Réalisations',
 'nav.contact':'Contact',
-'nav.start':'Commencer',
+'nav.start':'Parlons-en',
 'nav.language':'Langue',
 'hero.title':'Nous créons des sites qui transforment les visiteurs en clients.',
 'hero.sub':'Votre site est votre meilleur commercial… ou le plus discret. Nous concevons et développons des sites sur mesure, rapides et optimisés pour Google, qui inspirent confiance en quelques secondes et donnent envie d’appeler, de réserver ou d’acheter.',

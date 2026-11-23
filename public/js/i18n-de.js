@@ -4,7 +4,7 @@ export default {
 'nav.services':'Leistungen',
 'nav.work':'Arbeiten',
 'nav.contact':'Kontakt',
-'nav.start':'Jetzt starten',
+'nav.start':'Sprechen wir',
 'nav.language':'Sprache',
 'hero.title':'Wir bauen Websites, die Besucher zu Kunden machen.',
 'hero.sub':'Ihre Website ist Ihr fleißigster Verkäufer – oder Ihr stillster. Wir gestalten und entwickeln individuelle, schnelle und suchmaschinenfreundliche Websites, die in Sekunden Vertrauen schaffen und es leicht machen, anzurufen, zu buchen oder zu kaufen.',

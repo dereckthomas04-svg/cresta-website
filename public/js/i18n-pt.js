@@ -4,7 +4,7 @@ export default {
 'nav.services':'Serviços',
 'nav.work':'Trabalhos',
 'nav.contact':'Contato',
-'nav.start':'Começar',
+'nav.start':'Vamos conversar',
 'nav.language':'Idioma',
 'hero.title':'Criamos sites que transformam visitantes em clientes.',
 'hero.sub':'Seu site é seu vendedor mais dedicado — ou o mais calado. Projetamos e desenvolvemos sites sob medida, rápidos e prontos para o Google, que conquistam confiança em segundos e facilitam ligar, agendar ou comprar.',
