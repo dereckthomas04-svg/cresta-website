@@ -53,20 +53,21 @@ function initAnalytics() {
 
 // ───────── static content ─────────
 const WORK = [
-  { k: 'w1', name: 'Saffron & Salt', bg: '#1f140f', ink: '#f3e6d4', acc: '#d9822b', img: 'linear-gradient(150deg,#e3a857,#8a3b12)', title: 'Dinner, the slow way.', btn: 'Reserve' },
-  { k: 'w2', name: 'Hale Mercer LLP', bg: '#f2f0ec', ink: '#1b2430', acc: '#1b2430', img: 'linear-gradient(160deg,#c8ccd2,#6b7684)', title: 'Counsel that stays calm.', btn: 'Consultation' },
-  { k: 'w3', name: 'Brightline Dental', bg: '#eef6f6', ink: '#0f3b3e', acc: '#16858a', img: 'linear-gradient(160deg,#bfe5e3,#5fb3b0)', title: 'Gentle care, clear prices.', btn: 'Book visit' },
-  { k: 'w4', name: 'Northgate Homes', bg: '#ffffff', ink: '#13201a', acc: '#2e5b45', img: 'linear-gradient(160deg,#a9c3b4,#3d6b55)', title: 'Find the one.', btn: 'Valuation' },
-  { k: 'w5', name: 'Forge Athletics', bg: '#111111', ink: '#ffffff', acc: '#e4ff3a', img: 'linear-gradient(160deg,#444,#111)', title: 'TRAIN HARDER.', btn: 'Free trial' },
-  { k: 'w6', name: 'Lumen Botanics', bg: '#f6efe9', ink: '#3a2a24', acc: '#b26e5a', img: 'linear-gradient(160deg,#f1d7c8,#c89683)', title: 'Skin, simply.', btn: 'Shop now' }
+  { k: 'w1', name: 'Saffron & Salt', bg: '#1f140f', ink: '#f3e6d4', acc: '#d9822b', img: 'linear-gradient(150deg,#e3a857,#8a3b12)', nav: ['Menu', 'Private dining', 'Visit'], title: 'Dinner, the slow way.', sub: 'Wood-fired plates and natural wine on Magnolia Ave.', btn: 'Reserve a table', chips: ['Tonight 5–10 pm', '★ 4.8 · 640 reviews'] },
+  { k: 'w2', name: 'Hale Mercer LLP', bg: '#f2f0ec', ink: '#1b2430', acc: '#1b2430', img: 'linear-gradient(160deg,#c8ccd2,#6b7684)', nav: ['Practice areas', 'Attorneys', 'Contact'], title: 'Counsel that stays calm.', sub: 'Business and family law for North Texas since 2009.', btn: 'Free consultation', chips: ['Same-week calls', 'Se habla español'] },
+  { k: 'w3', name: 'Brightline Dental', bg: '#eef6f6', ink: '#0f3b3e', acc: '#16858a', img: 'linear-gradient(160deg,#bfe5e3,#5fb3b0)', nav: ['Treatments', 'Prices', 'Insurance'], title: 'Gentle care, clear prices.', sub: 'New patient exam, X-rays and cleaning: $129.', btn: 'Book a visit', chips: ['Open Saturdays', 'Most PPO plans'] },
+  { k: 'w4', name: 'Northgate Homes', bg: '#ffffff', ink: '#13201a', acc: '#2e5b45', img: 'linear-gradient(160deg,#a9c3b4,#3d6b55)', nav: ['Buy', 'Sell', 'Neighborhoods'], title: 'Find the one.', sub: '42 homes for sale across Tarrant County this week.', btn: 'Free valuation', chips: ['3 bd · 2 ba · $389k', 'New this week'] },
+  { k: 'w5', name: 'Forge Athletics', bg: '#111111', ink: '#ffffff', acc: '#e4ff3a', img: 'linear-gradient(160deg,#444,#111)', nav: ['Classes', 'Coaches', 'Pricing'], title: 'TRAIN HARDER.', sub: 'Strength and conditioning classes, 5 am to 8 pm.', btn: 'Start free trial', chips: ['First week free', '28 classes / week'] },
+  { k: 'w6', name: 'Lumen Botanics', bg: '#f6efe9', ink: '#3a2a24', acc: '#b26e5a', img: 'linear-gradient(160deg,#f1d7c8,#c89683)', nav: ['Shop', 'Ingredients', 'Journal'], title: 'Skin, simply.', sub: 'Small-batch skincare with five ingredients or fewer.', btn: 'Shop now', chips: ['Free shipping $50+', '★ 4.9 · 1,204'] }
 ];
 function renderWork() {
   $('#workGrid').innerHTML = WORK.map(w => `
     <article class="wcard reveal in">
       <div class="wthumb" style="background:linear-gradient(160deg,${w.acc}1f,#eef0f4)" aria-hidden="true">
         <div class="mini" style="background:${w.bg};color:${w.ink}">
-          <div class="mn">${esc(w.name.toUpperCase())}<i></i><i></i><i></i></div>
-          <div class="mh"><div><div class="mt">${esc(w.title)}</div><span class="mb" style="background:${w.acc};color:${w.bg}">${esc(w.btn)}</span></div><div class="mi" style="background:${w.img}"></div></div>
+          <div class="mn"><b>${esc(w.name.toUpperCase())}</b>${w.nav.map(n => `<span>${esc(n)}</span>`).join('')}</div>
+          <div class="mh"><div><div class="mt">${esc(w.title)}</div><p class="ms">${esc(w.sub)}</p><span class="mb" style="background:${w.acc};color:${w.bg}">${esc(w.btn)}</span></div><div class="mi" style="background:${w.img}"></div></div>
+          <div class="mc">${w.chips.map(c => `<span style="border-color:${w.acc}55">${esc(c)}</span>`).join('')}</div>
         </div>
       </div>
       <div class="wmeta"><span>${esc(t('work.' + w.k + 'i'))}</span><h3>${esc(w.name)}</h3><p>${esc(t('work.' + w.k))}</p></div>
@@ -76,7 +77,10 @@ function renderWork() {
 function renderTestimonials() {
   const list = CONFIG.testimonials || [];
   const box = $('#testiList');
-  if (!list.length) {
+  const sec = $('#testimonials');
+  if (!list.length) { sec.hidden = true; return; }
+  sec.hidden = false;
+  if (false) {
     box.innerHTML = `<div class="testi-empty"><div><h3>${esc(t('testi.emptyT'))}</h3><p>${esc(t('testi.emptyP'))}</p></div><button class="btn btn-ghost" data-open="consult">${esc(t('testi.emptyCta'))}</button></div>`;
     return;
   }
@@ -93,6 +97,7 @@ function initContact() {
   $('#year').textContent = new Date().getFullYear();
   $('#fEmail').href = `mailto:${CONFIG.email}`; $('#fEmail').textContent = CONFIG.email;
   $('#fPhone').href = `tel:${CONFIG.phoneIntl}`; $('#fPhone').textContent = CONFIG.phone;
+  $('#founderPhone').href = `tel:${CONFIG.phoneIntl}`; $('#founderPhone').textContent = CONFIG.phone;
   if (CONFIG.hours) $('#fHours').textContent = CONFIG.hours; else $('#fHoursRow').remove();
   if (CONFIG.location) $('#fLoc').textContent = CONFIG.location; else $('#fLocRow').remove();
 }
