@@ -178,12 +178,17 @@ function composeMessage(form) {
   return { subject, body: lines.join('\n') };
 }
 function showFallback(form, msg) {
-  // A plain mailto: does nothing on computers without an email app set up,
-  // so give the visitor explicit, visible ways to send the prepared message.
+  const m = form.querySelector('.form-msg'); m.className = 'form-msg send-box';
+  renderSendOptions(m, msg, t('m.sendVia'));
+  m.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+// A plain mailto: does nothing on computers without an email app set up,
+// so give the visitor explicit, visible ways to send the prepared message.
+function renderSendOptions(m, msg, intro) {
   const enc = encodeURIComponent;
   const full = `${msg.subject}\n\n${msg.body}`;
-  const m = form.querySelector('.form-msg'); m.className = 'form-msg send-box'; m.textContent = '';
-  const p = document.createElement('p'); p.textContent = t('m.sendVia'); m.append(p);
+  m.textContent = '';
+  if (intro) { const p = document.createElement('p'); p.textContent = intro; m.append(p); }
   const row = document.createElement('div'); row.className = 'send-opts';
   const link = (cls, href, label, ev, blank = true) => {
     const a = document.createElement('a'); a.className = 'btn ' + cls; a.href = href; a.textContent = label;
@@ -202,7 +207,6 @@ function showFallback(form, msg) {
     catch { note.textContent = `${CONFIG.email}`; }
   });
   row.append(copy); m.append(row, note);
-  m.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 function initForms() {
   for (const form of $$('form[data-lead]')) {
@@ -216,7 +220,7 @@ function initForms() {
 }
 
 // ───────── audit ─────────
-let lastReport = null;
+let lastReport = null; let auditLead = null;
 const scoreClass = s => s == null ? '' : s >= 90 ? 'g' : s >= 50 ? 'm' : 'b';
 const scoreColor = s => s == null ? '#b9b1a9' : s >= 90 ? '#2f9e62' : s >= 50 ? '#d08a17' : '#c4243f';
 const PRIO_COLORS = { critical: '#8b0f2a', high: '#d0452b', medium: '#d39a2b', low: '#8a9aa6' };
@@ -230,6 +234,7 @@ function initAudit() {
     e.preventDefault();
     if (!validate(form)) return setMsg(form, 'err', t('m.invalid'));
     const url = normUrl(form.website.value); if (!url) return setMsg(form, 'err', t('m.badUrl'));
+    auditLead = { name: form.name.value.trim(), email: form.email.value.trim(), business: form.business.value.trim(), website: url };
     const btn = form.querySelector('[type=submit]'); btn.disabled = true; setMsg(form, '', '');
     track('audit_start');
     const shell = $('#reportShell'); shell.hidden = false; $('#report').innerHTML = ''; $('#auditProgress').hidden = false;
@@ -248,6 +253,7 @@ function initAudit() {
     clearTimeout(timer);
     setStep('report', 'run');
     const report = (page || mobile) ? buildReport({ url, mobile, desktop, page, errors }) : { fatal: true, url, errors };
+    report.business = auditLead.business || auditLead.name;
     lastReport = report;
     $('#auditProgress').hidden = true; setStep('report', 'ok');
     renderReport(report);
@@ -256,6 +262,19 @@ function initAudit() {
   });
 }
 
+function auditMessage(r) {
+  const L = auditLead || {};
+  const lines = [
+    `${t('f.name')}: ${L.name || ''}`, `${t('f.email')}: ${L.email || ''}`,
+    L.business ? `${t('f.business')}: ${L.business}` : null, `${t('f.website')}: ${r.url}`, ''];
+  if (r.fatal) lines.push(t('r.fatal'));
+  else {
+    lines.push(`${t('r.overall')}: ${r.overall ?? '—'}/100`, '', `${t('r.cats')}:`);
+    for (const c of r.categories) lines.push(`- ${t('cat.' + c.id)}: ${c.score == null ? (c.reason === 'manual' ? t('r.manual') : t('r.unavailable')) : c.score + '/100'}`);
+    if (r.issues.length) { lines.push('', `${t('r.issues')}:`); for (const i of r.issues.slice(0, 10)) lines.push(`- [${t('p.' + i.pr)}] ${issueText(i).title}`); }
+  }
+  return { subject: `${t('r.title')} — ${L.business || L.name || r.url}`, body: lines.filter(x => x != null).join('\n') };
+}
 function issueText(i) { return { title: t(`i.${i.id}.t`, i.p), fix: t(`i.${i.id}.f`, i.p) }; }
 function gauge(score) {
   const C = 2 * Math.PI * 80, off = score == null ? C : C * (1 - score / 100);
@@ -267,7 +286,9 @@ function renderReport(r) {
   if (r.fatal) {
     const why = [r.errors.inspect, r.errors.psi].filter(Boolean).map(k => t('why.' + k)).filter((v, i, a) => a.indexOf(v) === i).join(' ');
     box.innerHTML = `<div class="rep"><div class="rep-sec"><h4>${esc(t('r.fatal'))}</h4><p class="rep-err">${esc(why)}</p>
+      <h4 style="margin-top:24px">${esc(t('r.sendT'))}</h4><p class="rep-note">${esc(t('r.sendD'))}</p><div class="form-msg send-box" id="repSend"></div>
       <div class="rep-actions"><button class="btn btn-red" data-open="consult">${esc(t('r.helpBook'))}</button><button class="btn btn-ghost" data-again>${esc(t('r.again'))}</button></div></div></div>`;
+    renderSendOptions(box.querySelector('#repSend'), auditMessage(r));
     bindAgain(); return;
   }
   const date = new Intl.DateTimeFormat(lang === 'pt' ? 'pt-BR' : lang, { dateStyle: 'long', timeStyle: 'short' }).format(new Date(r.checkedAt));
@@ -306,6 +327,7 @@ function renderReport(r) {
     <header class="rep-top"><div><h3>${esc(t('r.title'))}</h3><p class="meta">${esc(r.url)}</p>
       <p class="meta">${r.business ? esc(t('r.for', { b: r.business })) + ' · ' : ''}${esc(t('r.checked', { d: date }))}</p>
       <p class="meta">${esc(t('r.basedOn', { n: r.categories.filter(c => c.score != null).length }))}</p></div>${gauge(r.overall)}</header>
+    <section class="rep-sec send-sec"><h4>${esc(t('r.sendT'))}</h4><p class="rep-note" style="margin:0 0 14px">${esc(t('r.sendD'))}</p><div class="form-msg send-box" id="repSend"></div></section>
     <section class="rep-sec"><h4>${esc(t('r.cats'))}</h4><div class="rows">${rows}</div>${unavailNote}<p class="rep-note">${esc(t('r.method'))}</p></section>
     ${vitalsHtml}
     <section class="rep-sec two"><div><h4>${esc(t('r.strengths'))}</h4>${strengths ? `<ul class="pill-list">${strengths}</ul>` : `<p>${esc(t('r.noStrengths'))}</p>`}</div>
@@ -318,6 +340,7 @@ function renderReport(r) {
     <section class="rep-sec"><div class="rep-actions"><button class="btn btn-ghost" data-print>${esc(t('r.print'))}</button><button class="btn btn-ghost" data-again>${esc(t('r.again'))}</button></div>
       <p class="rep-src" style="margin-top:16px">${esc(t('r.sources', { v: r.lighthouseVersion || '—' }))}</p></section>
   </article>`;
+  renderSendOptions(box.querySelector('#repSend'), auditMessage(r));
   requestAnimationFrame(() => requestAnimationFrame(() => {
     box.querySelectorAll('.trk i').forEach(i => (i.style.width = i.dataset.w + '%'));
     const arc = box.querySelector('.arc'); if (arc) arc.style.strokeDashoffset = arc.dataset.off;
@@ -326,7 +349,7 @@ function renderReport(r) {
   bindAgain();
 }
 function bindAgain() {
-  $('#report [data-again]')?.addEventListener('click', () => { lastReport = null; $('#reportShell').hidden = true; $('#auditForm input[name=website]').value = ''; $('#audit').scrollIntoView({ behavior: 'smooth' }); });
+  $('#report [data-again]')?.addEventListener('click', () => { lastReport = null; $('#reportShell').hidden = true; $('#auditForm input[name=website]').value = ''; auditLead = null; $('#audit').scrollIntoView({ behavior: 'smooth' }); });
 }
 
 // ───────── boot ─────────

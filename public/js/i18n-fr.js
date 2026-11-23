@@ -321,5 +321,7 @@ export default {
 'm.mailApp':"Utiliser ma messagerie",
 'm.wa':"Envoyer sur WhatsApp",
 'm.copy':"Copier le message",
-'m.copied':"Copié — collez-le dans un e-mail à {email}."
+'m.copied':"Copié — collez-le dans un e-mail à {email}.",
+'r.sendT':"Envoyez ces résultats à Cresta",
+'r.sendD':"Nous étudierons votre rapport et vous répondrons sous un jour ouvré avec ce que nous corrigerions en priorité — sans engagement."
 };

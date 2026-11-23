@@ -321,5 +321,7 @@ export default {
 'm.mailApp':"Usar mi app de correo",
 'm.wa':"Enviar por WhatsApp",
 'm.copy':"Copiar mensaje",
-'m.copied':"Copiado: pégalo en un correo a {email}."
+'m.copied':"Copiado: pégalo en un correo a {email}.",
+'r.sendT':"Envía estos resultados a Cresta",
+'r.sendD':"Revisaremos tu informe y te responderemos en un día laborable con lo que arreglaríamos primero, sin compromiso."
 };

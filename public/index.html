@@ -125,6 +125,11 @@
     </div>
     <form class="form panel reveal" id="auditForm" novalidate>
       <h3 data-i18n="audit.formTitle">Your free audit</h3>
+      <div class="f2">
+        <label><span data-i18n="f.name">Your name</span><input name="name" autocomplete="name" required maxlength="120"></label>
+        <label><span data-i18n="f.email">Email</span><input name="email" type="email" autocomplete="email" required maxlength="200"></label>
+      </div>
+      <label><span data-i18n="f.business">Business name</span><input name="business" autocomplete="organization" maxlength="160"></label>
       <label><span data-i18n="f.website">Website URL</span><input name="website" inputmode="url" autocomplete="url" required maxlength="300" placeholder="yourbusiness.com" data-i18n-ph="f.websitePh"></label>
       <button class="btn btn-red wide" type="submit" data-i18n="audit.button">Get My Free Website Audit</button>
       <p class="form-msg" role="status" aria-live="polite"></p>

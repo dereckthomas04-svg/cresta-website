@@ -321,5 +321,7 @@ export default {
 'm.mailApp':"Mein E-Mail-Programm öffnen",
 'm.wa':"Per WhatsApp senden",
 'm.copy':"Nachricht kopieren",
-'m.copied':"Kopiert – fügen Sie sie in eine E-Mail an {email} ein."
+'m.copied':"Kopiert – fügen Sie sie in eine E-Mail an {email} ein.",
+'r.sendT':"Ergebnisse an Cresta senden",
+'r.sendD':"Wir sehen uns Ihren Bericht an und antworten innerhalb eines Werktags mit dem, was wir zuerst beheben würden – unverbindlich."
 };
