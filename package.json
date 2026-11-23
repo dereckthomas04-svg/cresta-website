@@ -1,0 +1,12 @@
+{
+  "name": "cresta-agency-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cresta Agency – agency website with a real website audit tool and lead capture.",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/run.js"
+  },
+  "engines": { "node": ">=18.17" }
+}
